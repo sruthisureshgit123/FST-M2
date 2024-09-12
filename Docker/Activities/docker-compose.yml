@@ -1,0 +1,39 @@
+services:
+    postgres:
+        image: 'postgres:latest'
+        environment:
+            - POSTGRES_PASSWORD=postgres_password
+    redis:
+        image: 'redis:latest'
+        command: ["redis-server", "--protected-mode", "no"]
+    api:
+        build:
+            context: ./server
+        image: 'docker.io/sruthisuresh/complex-api'
+        environment:
+            - REDIS_HOST=redis
+            - REDIS_PORT=6379
+            - PGUSER=postgres
+            - PGHOST=postgres
+            - PGDATABASE=postgres
+            - PGPASSWORD=postgres_password
+            - PGPORT=5432
+    client:
+        build:
+            context: ./client
+        image: 'docker.io/sruthisuresh/complex-client'
+    worker:
+        build: ./worker
+        image: 'docker.io/sruthisuresh/complex-worker'
+        environment:
+            - REDIS_HOST=redis
+            - REDIS_PORT=6379
+    nginx:
+        depends_on:
+            - api
+            - client
+        restart: always
+        build:
+            context: ./nginx
+        ports:
+            - '3050:80'
