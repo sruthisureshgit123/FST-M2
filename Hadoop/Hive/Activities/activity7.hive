@@ -1,0 +1,26 @@
+-- Drop the table 
+DROP TABLE employee;
+
+-- Create the Employee table
+CREATE TABLE employee
+(id INT, name STRING, dept STRING, yoj INT, salary INT)
+ROW FORMAT DELIMITED FIELDS TERMINATED BY ','
+TBLPROPERTIES ("skip.header.line.count"="1");
+
+-- Load data into table 
+LOAD DATA LOCAL INPATH 'root/empData.csv' INTO TABLE employee;
+
+-- Export results to local folder
+INSERT OVERWRITE DIRECTORY 'hdfs:///user/sruthi/HiveResult1'
+ROW FORMAT DELIMITED FIELDS TERMINATED BY ','
+SELECT id, name FROM employee;
+
+-- Export result2
+INSERT OVERWRITE LOCAL DIRECTORY 'root/HiveResult2'
+ROW FORMAT DELIMITED FIELDS TERMINATED BY ','
+SELECT * FROM employee where salary > 30000;
+
+-- Export result3
+INSERT OVERWRITE LOCAL DIRECTORY 'root/HiveResult3'
+ROW FORMAT DELIMITED FIELDS TERMINATED BY ','
+SELECT COUNT(*) FROM employee;
